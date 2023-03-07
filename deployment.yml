@@ -1,0 +1,19 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: onlyoffice-nextcloud
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: onlyoffice-nextcloud
+  template:
+    metadata:
+      labels:
+        app: onlyoffice-nextcloud
+    spec:
+      containers:
+      - name: onlyoffice-nextcloud
+        image: {{DOCKER_REGISTRY}}/{{DOCKER_REPOSITORY}}/{{DOCKER_IMAGE}}:{{IMAGE_TAG}}
+        ports:
+        - containerPort: 80
