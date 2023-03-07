@@ -34,12 +34,9 @@ jobs:
         credentials_json: '${{ secrets.GOOGLE_APPLICATION_CREDENTIALS }}'
 
     - name: Docker configuration
-      run:
-        env:
-          ACCESS_TOKEN: ${{ steps.auth.outputs.access_token }}
-        command: echo $ACCESS_TOKEN | docker login -u oauth2accesstoken --password-stdin https://${GAR_LOCATION}-docker.pkg.dev
-
-
+      run: |
+        ACCESS_TOKEN=$(gcloud auth print-access-token)
+        echo $ACCESS_TOKEN | docker login -u oauth2accesstoken --password-stdin https://${GAR_LOCATION}-docker.pkg.dev
 
     # Get the GKE credentials so we can deploy to the cluster
     - name: Set up GKE credentials
@@ -50,24 +47,27 @@ jobs:
 
     # Build the Docker image
     - name: Build
-      run: |-
+      run: |
         docker build \
           --tag "$GAR_LOCATION-docker.pkg.dev/$PROJECT_ID/$REPOSITORY/$IMAGE:$GITHUB_SHA" \
           --build-arg GITHUB_SHA="$GITHUB_SHA" \
           --build-arg GITHUB_REF="$GITHUB_REF" \
           .
+
     # Push the Docker image to Google Artifact Registry
     - name: Publish
-      run: |-
+      run: |
         docker push "$GAR_LOCATION-docker.pkg.dev/$PROJECT_ID/$REPOSITORY/$IMAGE:$GITHUB_SHA"
+
     # Set up kustomize
     - name: Set up Kustomize
-      run: |-
+      run: |
         curl -sfLo kustomize https://github.com/kubernetes-sigs/kustomize/releases/download/v3.1.0/kustomize_3.1.0_linux_amd64
         chmod u+x ./kustomize
+
     # Deploy the Docker image to the GKE cluster
     - name: Deploy
-      run: |-
+      run: |
         # replacing the image name in the kustomization.yaml file
         sed -i "s/image:.*$/image: $GAR_LOCATION-docker.pkg.dev\/$PROJECT_ID\/$REPOSITORY\/$IMAGE:$GITHUB_SHA/" k8s/base/kustomization.yaml
         # deploying the kustomization
