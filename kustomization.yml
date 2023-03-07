@@ -1,0 +1,9 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+resources:
+- deployment.yml
+namespace: onlyoffice-nextcloud
+images:
+- name: {{DOCKER_REGISTRY}}/{{DOCKER_REPOSITORY}}/{{DOCKER_IMAGE}}
+  newName: {{DOCKER_REGISTRY}}/{{DOCKER_REPOSITORY}}/{{DOCKER_IMAGE}}
+  newTag: {{IMAGE_TAG}}
