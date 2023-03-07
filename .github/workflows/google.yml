@@ -37,10 +37,10 @@ jobs:
         #service_account: 'git-828@phonic-chemist-379221.iam.gserviceaccount.com'
 
     # Alternative option - authentication via credentials json
-     - id: 'auth'
-       uses: 'google-github-actions/auth@v0'
-       with:
-         credentials_json: '${{ secrets.GOOGLE_APPLICATION_CREDENTIALS }}'
+    - id: 'auth'
+      uses: 'google-github-actions/auth@v0'
+      with:
+        credentials_json: '${{ secrets.GOOGLE_APPLICATION_CREDENTIALS }}'
 
     - name: Docker configuration
       run: |-
@@ -72,4 +72,5 @@ jobs:
     # Deploy the Docker image to the GKE cluster
     - name: Deploy
       run: |-
-        # replacing the image name in the k
+        # replacing the image name in the kustomization.yaml file
+        sed -i "s
